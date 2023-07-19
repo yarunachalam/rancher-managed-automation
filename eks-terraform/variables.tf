@@ -1,11 +1,11 @@
 # AWS access key used to create infrastructure
 variable "aws_access_key" {
- default  = "AKIA3ZKWXZJC5DIG4UHF"
+ default  = ""
 }
 
 # AWS secret key used to create infrastructure
 variable "aws_secret_key" {
- default = "D/990ijR0aM48jr/K80WsuS00AExYZ8mZjoiJYR7"
+ default = ""
 }
 
 # AWS region used for all resources
