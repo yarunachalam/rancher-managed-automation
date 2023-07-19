@@ -40,12 +40,13 @@ case "$cloud_provider" in
           cd gke-terraform
 	  var_file="$PWD"/terraform.tfvars
 	  cluster_name=$(grep 'project_id' ${var_file} |awk '{ print $3 }'|tr -d '"')
+	  region=$(grep 'region' ${var_file} |awk '{ print $3 }'|tr -d '"')
           echo "Destroying Cluster"
           destroy_cluster
           echo "Destroying Cluster from kubeconfig"
-	  kubectl config delete-context ${cluster_name}-gke
-	  kubectl config delete-user ${cluster_name}-gke
-	  kubectl config delete-cluster ${cluster_name}-gke
+	  kubectl config delete-context gke_${cluster_name}_${region}_${cluster_name}-gke
+	  kubectl config delete-user gke_${cluster_name}_${region}_${cluster_name}-gke
+	  kubectl config delete-cluster gke_${cluster_name}_${region}_${cluster_name}-gke
           ;;
        (eks)
           cd eks-terraform

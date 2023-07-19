@@ -14,9 +14,6 @@ Configure kubectl
 
 After cloning this repo
 ```
-$ chmod +x deploy-csp-nv.sh
-$ chmod +x destroy-csp-nv.sh
-
 $ cd aks-terraform 
 $ cp terrafrom.template.tfvars terrafrom.tfvars
 Update terraform.tfvars values 
