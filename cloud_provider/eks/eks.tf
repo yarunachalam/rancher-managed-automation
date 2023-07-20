@@ -39,6 +39,15 @@ resource "aws_iam_role_policy_attachment" "amazon_eks_cluster_policy" {
 # Resource: aws_eks_cluster
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster
 
+# Rancher cloud credentials
+resource "rancher2_cloud_credential" "credential_aws" {
+  name = "AWS Credentials"
+  amazonec2_credential_config {
+    access_key = var.aws_access_key
+    secret_key = var.aws_secret_key
+  }
+}
+
 resource "aws_eks_cluster" "eks" {
   # Name of the cluster.
   name = "${var.resource_prefix}-eks" 
@@ -72,3 +81,42 @@ resource "aws_eks_cluster" "eks" {
     aws_iam_role_policy_attachment.amazon_eks_cluster_policy
   ]
 }
+
+# Rancher cluster
+resource "rancher2_cluster" "cluster_aws" {
+  depends_on = [aws_eks_cluster.eks]
+  name         = "eks-cluster"
+  description  = "Terraform"
+  eks_config_v2 {
+    cloud_credential_id = rancher2_cloud_credential.credential_aws.id
+    name = "${var.resource_prefix}-eks"
+    region = "us-east-2"
+    imported = true
+  }
+}
+
+# Delay hack part 1
+resource "null_resource" "before" {
+  depends_on = [rancher2_cluster.cluster_aws]
+}
+
+# Delay hack part 2
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep ${var.delaysec}"
+  }
+
+  triggers = {
+    "before" = "null_resource.before.id"
+  }
+}
+
+# Kubeconfig file
+resource "local_file" "kubeconfig" {
+  filename = "${path.module}/.kube/config"
+  content = rancher2_cluster.cluster_aws.kube_config
+  file_permission = "0600"
+
+  depends_on = [null_resource.delay]
+}
+

@@ -16,8 +16,27 @@ variable "aws_region" {
  description = "AWS availability zone 1 for the aws_region"
 }
 
+variable "aws_az1" {
+  type = string
+  description = "AWS availability zone 1 for the aws_region"
+}
+
+variable "aws_az2" {
+  type = string
+  description = "AWS availability zone 2 for the aws_region"
+}
+
 # Prefix of the resources that will be created under this module
 variable "resource_prefix" {
  type     = string
  description = "prefix of the resources that will be created under this module"
+}
+
+variable "rancher_url" { }
+
+variable "rancher_token" { }
+
+# Hack: Time to wait for Kubernetes to deploy
+variable "delaysec" {
+	default = 120
 }

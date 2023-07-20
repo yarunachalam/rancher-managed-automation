@@ -18,6 +18,16 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = false
 }
 
+# Rancher cloud credentials
+resource "rancher2_cloud_credential" "credential_az" {
+  name = "AZ Credentials"
+  azure_credential_config {
+    client_id = var.client_id
+    client_secret = var.client_secret
+    subscription_id = var.subscription_id
+  }
+}
+
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.cluster_name
   kubernetes_version  = var.kubernetes_version
@@ -41,5 +51,34 @@ resource "azurerm_kubernetes_cluster" "aks" {
   network_profile {
     load_balancer_sku = "standard"
     network_plugin    = "kubenet" 
+  }
+}
+
+# Rancher cluster
+resource "rancher2_cluster" "cluster_az" {
+  depends_on = [azurerm_kubernetes_cluster.aks]
+  name         = var.cluster_name
+  description  = "Terraform"
+  aks_config_v2 {
+    cloud_credential_id = rancher2_cloud_credential.credential_az.id
+    resource_group = azurerm_resource_group.aks-rg.name 
+    resource_location = var.location
+    imported = true
+  }
+}
+
+# Delay hack part 1
+resource "null_resource" "before" {
+  depends_on = [rancher2_cluster.cluster_az]
+}
+
+# Delay hack part 2
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep ${var.delaysec}"
+  }
+
+  triggers = {
+    "before" = "null_resource.before.id"
   }
 }

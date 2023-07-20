@@ -9,14 +9,14 @@ resource "aws_subnet" "public_1" {
   cidr_block = "192.168.0.0/18"
 
   # The AZ for the subnet.
-  availability_zone = "us-east-2a"
+  availability_zone = var.aws_az1
 
   # Required for EKS. Instances launched into the subnet should be assigned a public IP address.
   map_public_ip_on_launch = true
 
   # A map of tags to assign to the resource.
   tags = {
-    Name                        = "public-us-east-2a"
+    Name                        = "public-${var.aws_az1}"
     "kubernetes.io/cluster/eks" = "shared"
     "kubernetes.io/role/elb"    = 1
   }
@@ -30,14 +30,14 @@ resource "aws_subnet" "public_2" {
   cidr_block = "192.168.64.0/18"
 
   # The AZ for the subnet.
-  availability_zone = "us-east-2b"
+  availability_zone = var.aws_az2 
 
   # Required for EKS. Instances launched into the subnet should be assigned a public IP address.
   map_public_ip_on_launch = true
 
   # A map of tags to assign to the resource.
   tags = {
-    Name                        = "public-us-east-2b"
+    Name                        = "public-${var.aws_az2}"
     "kubernetes.io/cluster/eks" = "shared"
     "kubernetes.io/role/elb"    = 1
   }
@@ -51,11 +51,11 @@ resource "aws_subnet" "private_1" {
   cidr_block = "192.168.128.0/18"
 
   # The AZ for the subnet.
-  availability_zone = "us-east-2a"
+  availability_zone = var.aws_az1 
 
   # A map of tags to assign to the resource.
   tags = {
-    Name                              = "private-us-east-2a"
+    Name                              = "private-${var.aws_az1}"
     "kubernetes.io/cluster/eks"       = "shared"
     "kubernetes.io/role/internal-elb" = 1
   }
@@ -69,11 +69,11 @@ resource "aws_subnet" "private_2" {
   cidr_block = "192.168.192.0/18"
 
   # The AZ for the subnet.
-  availability_zone = "us-east-2b"
+  availability_zone = var.aws_az2 
 
   # A map of tags to assign to the resource.
   tags = {
-    Name                              = "private-us-east-2b"
+    Name                              = "private-${var.aws_az2}"
     "kubernetes.io/cluster/eks"       = "shared"
     "kubernetes.io/role/internal-elb" = 1
   }
